@@ -1,0 +1,37 @@
+# The command that runs the program.
+run = "python3 app.py"
+
+# The primary language of the repl. There can be others, though!
+language = "python3"
+# The main file, which will be shown by default in the editor.
+entrypoint = "app.py"
+# A list of globs that specify which files and directories should
+# be hidden in the workspace.
+hidden = ["venv", ".config", "**/__pycache__", "**/.mypy_cache", "**/*.pyc"]
+
+# Specifies which nix channel to use when building the environment.
+[nix]
+channel = "stable-21_11"
+
+# Per-language configuration: python3
+[languages.python3]
+# Treats all files that end with `.py` as Python.
+pattern = "**/*.py"
+# Tells the workspace editor to syntax-highlight these files as
+# Python.
+syntax = "python"
+
+# The environment variables needed to correctly start Python and use the
+# package proxy.
+[env]
+VIRTUAL_ENV = "/home/runner/${REPL_SLUG}/venv"
+PATH = "${VIRTUAL_ENV}/bin"
+PYTHONPATH="${VIRTUAL_ENV}/lib/python3.8/site-packages"
+REPLIT_POETRY_PYPI_REPOSITORY="https://package-proxy.replit.com/pypi/"
+MPLBACKEND="TkAgg"
+
+
+# Configures the packager.
+[packager]
+# Search packages in PyPI.
+language = "python3"
