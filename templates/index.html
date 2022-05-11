@@ -1,0 +1,70 @@
+{% extends "template.html" %}
+{% block content%}
+    <table>
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>warehouse</th>
+            <th>quantity</th>
+        </tr>
+        {% for item in inventory%}
+        <tr>
+            <td>{{item[0]}}</td>
+            <td>{{item[2]}}</td>
+            <td>{{item[1]}}</td>
+            <td>{{item[3]}}</td>
+            <td class = "no-border"> 
+                <button class = "edit">Edit</button>
+                <div class = "overlay">
+                    <p>Edit Inventory Item:</p>
+                    <form action = "update-inv" method = "post">
+                        <input name="id" type="hidden" value = "{{item[0]}}" required>
+                        <input name = "name" type = "text" value = "{{item[2]}}" required>
+                        <select name = "wh" required >
+                            {% for warehouse in wh %}
+                                <option value = "{{warehouse[0]|string +': '+ warehouse[1]}}">{{warehouse[0]|string +': '+warehouse[1]}}</option>
+                            {% endfor %}
+                        </select>
+                        <input name = "quantity" type = "number" value = "{{item[3]}}" required>
+                        <button type = submit>Submit</button>
+                    </form>
+                </div>
+
+            </td>
+            <td class = "no-border">
+                <form action="delete" method = "post">
+                    <input name="id" type="hidden" value = "{{item[0]}}">
+                    <button type = submit>Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+
+    </table>
+
+    
+
+    <p>Add inventory:</p>
+    <form  action="inventory" method = "post"> 
+        <input name="name" placeholder="name..." required>
+        <select name = "warehouse" required >
+            {% for warehouse in wh %}
+                <option value = "{{warehouse[0]|string +': '+ warehouse[1]}}">{{warehouse[0]|string +': '+warehouse[1]}}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity" placeholder="quantity..." required>
+        <button type = "submit" >Add to inventory</button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories = True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "add_error"%}
+            <div>{{ message }}</div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+{% endblock %}

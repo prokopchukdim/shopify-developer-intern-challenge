@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>Shopify F2022 Intern Challenge</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <div style = "height:20px;"></div>
+    <nav id = "nav">
+        <a href = "{{url_for('home')}}">Inventory</a>
+        <a href = "{{url_for('warehouses')}}">Warehouses</a>
+    </nav>
+    <div style = "height:20px;"></div>
+
+    {% block content %}
+    {% endblock %}
+
+    <!-- JS -->
+	<script src="{{ url_for('static', filename = 'main.js')}}"></script>
+</body>
