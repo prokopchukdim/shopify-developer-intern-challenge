@@ -22,19 +22,23 @@
                         <input name = "name" type = "text" value = "{{item[2]}}" required>
                         <select name = "wh" required >
                             {% for warehouse in wh %}
-                                <option value = "{{warehouse[0]|string +': '+ warehouse[1]}}">{{warehouse[0]|string +': '+warehouse[1]}}</option>
+                            {% if warehouse[0]|string == item[1]|string %}    
+                                <option selected = "selected">{{warehouse[0]|string +': '+warehouse[1]}}</option>
+                            {% else %}
+                                <option>{{warehouse[0]|string +': '+warehouse[1]}}</option>
+                            {% endif %}
                             {% endfor %}
                         </select>
                         <input name = "quantity" type = "number" value = "{{item[3]}}" required>
-                        <button type = submit>Submit</button>
+                        <button >Submit</button>
                     </form>
                 </div>
 
             </td>
             <td class = "no-border">
-                <form action="delete" method = "post">
+                <form action="invdelete" method = "post">
                     <input name="id" type="hidden" value = "{{item[0]}}">
-                    <button type = submit>Delete</button>
+                    <button >Delete</button>
                 </form>
             </td>
         </tr>
@@ -42,8 +46,6 @@
 
 
     </table>
-
-    
 
     <p>Add inventory:</p>
     <form  action="inventory" method = "post"> 
@@ -56,15 +58,5 @@
         <input type="number" name="quantity" placeholder="quantity..." required>
         <button type = "submit" >Add to inventory</button>
     </form>
-
-    {% with messages = get_flashed_messages(with_categories = True) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        {% if category == "add_error"%}
-            <div>{{ message }}</div>
-        {% endif %}
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
 
 {% endblock %}

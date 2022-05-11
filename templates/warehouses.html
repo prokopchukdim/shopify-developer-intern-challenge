@@ -1,0 +1,46 @@
+{% extends "template.html" %}
+{% block content%}
+    <table>
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>address</th>
+        </tr>
+        
+        {% for w in wh %}
+        <tr>
+            <td>{{w[0]}}</td>
+            <td>{{w[1]}}</td>
+            <td>{{w[2]}}</td>
+            <td class = "no-border"> 
+                <button class = "edit">Edit</button>
+                <div class = "overlay">
+                    <p>Edit Inventory Item:</p>
+                    <form action = "update-wh" method = "post">
+                        <input name="id" type="hidden" value = "{{w[0]}}" required>
+                        <input name = "name" type = "text" value = "{{w[1]}}" required>
+                        <input name = "address" type = "text" value = "{{w[2]}}" required>
+                        <button type = submit>Submit</button>
+                    </form>
+                </div>
+
+            </td>
+            <td class = "no-border">
+                <form action="warehousedelete" method = "post">
+                    <input name="id" type="hidden" value = "{{w[0]}}">
+                    <button type = submit>Delete</button>
+                </form>
+            </td>
+        </tr>
+
+        {% endfor %}
+    </table>
+    <p>Warning: Deleting a warehouse will remove all inventory associated with it</p>
+
+    <p>Add Warehouse:</p>
+    <form  action="warehouses" method = "post"> 
+        <input type="text" name="name" placeholder="name..." required>
+        <input type="text" name="address" placeholder="address..." required>
+        <button type = "submit">Add Warehouse</button>
+    </form>
+{% endblock %}

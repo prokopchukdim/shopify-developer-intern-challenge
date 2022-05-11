@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 class Inventory(db.Model):
     __tablename__ = "Inventory"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    warehouseid = db.Column(db.Integer)
+    warehouseid = db.Column(db.Integer, db.ForeignKey('Warehouse.id'))
     name = db.Column(db.String(100))
     quantity = db.Column(db.Integer)
 
@@ -31,6 +31,7 @@ class Warehouse(db.Model):
     def __repr__(self):
         return f"Warehouse('{self.id}', '{self.name}', '{self.address}')"
 
+#GET and POST requests for home/inventory page
 @app.route('/')
 @app.route('/home')
 @app.route('/inventory', methods = ['GET', 'POST'])
@@ -48,6 +49,7 @@ def home():
 
         #Different items can potentially have the same name, so no checking for duplicate inventory.
 
+        #Add item to db
         item = Inventory(name = name, warehouseid = warehouse, quantity = quantity)
         db.session.add(item)
         db.session.commit()
@@ -60,18 +62,42 @@ def home():
         wh = db.engine.execute("SELECT * FROM warehouse").all()
         return render_template("index.html", inventory=inventory, wh = wh)
 
-@app.route('/warehouses')
-def warehouses():
-    inventory = db.engine.execute("SELECT * FROM inventory").all()
-    wh = db.engine.execute("SELECT * FROM warehouse").all()
-    return render_template("index.html", inventory = inventory, wh = wh)
 
-@app.route('/delete', methods = ['POST'])
-def delete():
+#GET and POST requests for warehouses page
+@app.route('/warehouses', methods = ['GET', 'POST'])
+def warehouses():
+    if request.method == 'GET':
+        #Query all warehouses from database and display to user
+        wh = db.engine.execute("SELECT * FROM warehouse").all()
+        return render_template("warehouses.html", wh = wh)
+    else:
+        #Add new warehouse to database
+        name = request.form['name']
+        address = request.form['address']
+        warehouse = Warehouse(name = name, address = address)
+        db.session.add(warehouse)
+        db.session.commit()
+        return redirect(url_for("warehouses"))
+
+
+#POST requests for inventory delete
+@app.route('/invdelete', methods = ['POST'])
+def invdelete():
     id = request.form["id"]
     db.engine.execute("DELETE FROM inventory WHERE id = :id", {"id":id})
     return redirect(url_for("home"))
 
+#POST requests for warehouse delete
+@app.route('/warehousedelete', methods = ['POST'])
+def warehousedelete():
+    id = request.form["id"]
+
+    #Delete warehouse and all associated inventory
+    db.engine.execute("DELETE FROM warehouse WHERE id = :id", {"id":id})
+    db.engine.execute("DELETE FROM inventory WHERE warehouseid = :id", {"id":id})
+    return redirect(url_for("warehouses"))
+
+#Post requests for updating inventory
 @app.route('/update-inv', methods = ['POST'])
 def updateinv():
     id = request.form["id"]
@@ -79,10 +105,19 @@ def updateinv():
     warehouse = int(warehouse[0:warehouse.find(":")])
     quantity = request.form['quantity']
     name = request.form['name']
-    print(id + str(warehouse) +quantity + name)
 
     db.engine.execute("UPDATE inventory SET warehouseid = :wh, quantity = :q, name = :name WHERE id = :id", {"wh":warehouse, "q":quantity, "name": name, "id":id})
     return redirect(url_for("home"))
+
+#Post requests for updating warehouse
+@app.route('/update-wh', methods = ['POST'])
+def updatewh():
+    id = request.form["id"]
+    name = request.form['name']
+    address = request.form['address']
+
+    db.engine.execute("UPDATE warehouse SET address = :a, name = :name WHERE id = :id", {"a":address, "name": name, "id":id})
+    return redirect(url_for("warehouses"))
 
 if __name__ == "__main__":
     app.run(debug = True)
